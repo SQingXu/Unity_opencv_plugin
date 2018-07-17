@@ -48,8 +48,8 @@ sysinfo.txt
 
 # Build results
 OpenCVAruco/[Dd]ebug/
-OpenCVAruco/Dd]ebugPublic/
-OpenCVAruco/Rr]elease/
+OpenCVAruco/[Dd]ebugPublic/
+OpenCVAruco/[Rr]elease/
 OpenCVAruco/[Rr]eleases/
 OpenCVAruco/x64/
 OpenCVAruco/x86/
