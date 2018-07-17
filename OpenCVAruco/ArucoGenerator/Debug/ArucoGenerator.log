@@ -1,5 +1,0 @@
-﻿  ArucoGenerator.cpp
-c:\users\xsq4525\documents\opencvaruco\arucogenerator\arucogenerator.cpp(12): error C2653: 'cv': is not a class or namespace name
-c:\users\xsq4525\documents\opencvaruco\arucogenerator\arucogenerator.cpp(12): error C2065: 'Mat': undeclared identifier
-c:\users\xsq4525\documents\opencvaruco\arucogenerator\arucogenerator.cpp(12): error C2146: syntax error: missing ';' before identifier 'marker'
-c:\users\xsq4525\documents\opencvaruco\arucogenerator\arucogenerator.cpp(12): error C2065: 'marker': undeclared identifier
