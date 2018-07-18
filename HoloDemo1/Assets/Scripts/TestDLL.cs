@@ -46,7 +46,7 @@ public class TestDLL : MonoBehaviour {
         {
             //Debug.Log("coroutine called");
             DetectMarkersAruco();
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(1.0f/5);
 
         }
     }

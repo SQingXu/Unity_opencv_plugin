@@ -35,11 +35,11 @@ bool ConvertMat(SoftwareBitmap^ from, Mat& convertedMat) {
 	if (!GetPointerToPixelData(from, &pPixels, &capacity)) {
 		return false;
 	}
-	DebugInUnity("width: " + std::to_string(from->PixelWidth));
-	DebugInUnity("height: " + std::to_string(from->PixelHeight));
+	//DebugInUnity("width: " + std::to_string(from->PixelWidth));
+	//DebugInUnity("height: " + std::to_string(from->PixelHeight));
 	Mat mat(from->PixelHeight,
 		from->PixelWidth,
-		CV_8UC4,
+		CV_8UC1,
 		(void*)pPixels);
 
 	convertedMat = mat;

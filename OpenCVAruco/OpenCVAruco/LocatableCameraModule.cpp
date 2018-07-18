@@ -59,7 +59,6 @@ namespace HololensCamera {
 					{
 						selectedSourceInfo = sourceInfo;
 						DebugInUnity("color id: " + id_str);
-						DebugInUnity("Find the color sourceInfo");
 					}
 					if (sourceInfo->SourceKind == MediaFrameSourceKind::Image) {
 						image = true;
@@ -128,7 +127,7 @@ namespace HololensCamera {
 	{
 		auto lock = std::shared_lock<std::shared_mutex>(m_propertiesLock);
 		if (m_frame != nullptr) {
-			DebugInUnity("m_frame is not null");
+			//DebugInUnity("m_frame is not null");
 		}
 		return m_frame;
 	}
@@ -158,16 +157,16 @@ namespace HololensCamera {
 						// Handling this part before performance demanding processes tends to prevent throw exceptions.
 
 						// cameraSpatialCoordinateSystem only contains translation
-						//auto cameraSpatialCoordinateSystemObject(frame->Properties->Lookup(m_coordinateSystemGuid));
-						//auto cameraSpatialCoordinateSystem(safe_cast<SpatialCoordinateSystem^>(cameraSpatialCoordinateSystemObject));
+						auto cameraSpatialCoordinateSystemObject(frame->Properties->Lookup(m_coordinateSystemGuid));
+						auto cameraSpatialCoordinateSystem(safe_cast<SpatialCoordinateSystem^>(cameraSpatialCoordinateSystemObject));
 						//// cameraViewTransform consists of rotation and translation
-						//auto cameraViewTransformBox(safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_viewTransformGuid)));
-						//auto cameraProjectionTransformBox = safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_projectionTransformGuid));
-						//auto cameraViewTransform(LocatableCameraModule::IBoxArrayToMatrix(cameraViewTransformBox));
-						//auto cameraProjectionTransform = LocatableCameraModule::IBoxArrayToMatrix(cameraProjectionTransformBox);
+						auto cameraViewTransformBox(safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_viewTransformGuid)));
+						auto cameraProjectionTransformBox = safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_projectionTransformGuid));
+						auto cameraViewTransform(LocatableCameraModule::IBoxArrayToMatrix(cameraViewTransformBox));
+						auto cameraProjectionTransform = LocatableCameraModule::IBoxArrayToMatrix(cameraProjectionTransformBox);
 
 						//DebugInUnity("Start to convert");
-						softwareBitmap = SoftwareBitmap::Convert(softwareBitmap, BitmapPixelFormat::Bgra8);
+						softwareBitmap = SoftwareBitmap::Convert(softwareBitmap, BitmapPixelFormat::Gray8);
 
 						//DebugInUnity("Finish converting");
 						{
@@ -175,8 +174,8 @@ namespace HololensCamera {
 							//DebugInUnity("load frame");
 							//DebugInUnity(std::to_string(m_frameId));
 							m_frame = std::make_shared<LocatableCameraFrame>(
-								++m_frameId, softwareBitmap/*, cameraSpatialCoordinateSystem,
-								cameraViewTransform, cameraProjectionTransform*/);
+								++m_frameId, softwareBitmap, cameraSpatialCoordinateSystem,
+								cameraViewTransform, cameraProjectionTransform);
 						}
 					}
 					catch (Platform::InvalidCastException^ e)

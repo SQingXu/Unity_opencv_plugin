@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/aruco/dictionary.hpp>
 #include <opencv2/aruco.hpp>
+#include <opencv2/imgproc.hpp>
 #include "LocatableCameraModule.h"
 #include "Helper.h"
 
@@ -16,10 +17,11 @@ using namespace Windows::Storage;
 
 std::shared_ptr<LocatableCameraModule> m_locatableCameraModule = nullptr;
 std::shared_ptr<LocatableCameraFrame> m_locatableCameraFrame = nullptr;
-std::vector<int> markerIds;
 std::vector<vector<Point2f>> markerCorners, rejectedCandidates;
 Ptr<aruco::DetectorParameters> parameters;
+std::vector<int> markerIds;
 Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_6X6_250);
+
 bool save = true;
 
 
@@ -65,9 +67,7 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 			Mat mat;
 			auto locatableCameraFrame = m_locatableCameraModule->GetFrame();
 			if (locatableCameraFrame != nullptr) {
-				DebugInUnity("frame is valid");
 				if (ConvertMat(locatableCameraFrame->GetSoftwareBitmap(), mat)) {
-					DebugInUnity("frame bitmap is successfully converted");
 					try {
 						if (save) {
 							Platform::String^ path = ApplicationData::Current->LocalCacheFolder->Path;
@@ -76,21 +76,22 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 							std::string filename = "test_img.jpg";
 							std::string filepath = (path_str + "/") + filename;
 							DebugInUnity(path_str);
-
 							cv::imwrite(filepath, mat);
 							save = false;
 						}
-						
-						aruco::detectMarkers(mat, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+						/*Mat bgr;
+						cvtColor(mat, bgr, cv::COLOR_BGRA2BGR);
+						Mat copy = bgr.clone();*/
+						aruco::detectMarkers(mat, dictionary, markerCorners, markerIds);
+						if (markerIds.size() > 0) {
+							//DebugInUnity("Recognize more 0 markers");
+							DebugInUnity(std::to_string(markerIds.at(0)));
+						}
 					}
 					catch (cv::Exception& e) {
 						DebugInUnity(e.msg);
 					}
-					DebugInUnity("finish detection");
-					if (markerIds.size() > 0) {
-						DebugInUnity("Recognize more 0 markers");
-						DebugInUnity(std::to_string(markerIds.at(0)));
-					}
+					
 				}
 			}else {
 				DebugInUnity("frame is not valid");
