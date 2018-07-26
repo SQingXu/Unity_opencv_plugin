@@ -12,13 +12,12 @@ namespace HololensCamera {
 			Windows::Media::Capture::Frames::MediaFrameReader^ reader,
 			Windows::Media::Capture::Frames::MediaFrameSource^ source);
 		std::shared_ptr<LocatableCameraFrame> GetFrame();
+		std::shared_mutex m_propertiesLock;
 
 	private:
 		void OnFrameArrived(
 			Windows::Media::Capture::Frames::MediaFrameReader^ sender,
 			Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs^ args);
-		Platform::Guid StringToGuid(Platform::String^ str);
-		DirectX::SimpleMath::Matrix IBoxArrayToMatrix(Platform::IBoxArray<uint8>^ array);
 
 		Platform::Guid m_coordinateSystemGuid;
 		Platform::Guid m_viewTransformGuid;
@@ -26,8 +25,7 @@ namespace HololensCamera {
 
 		Platform::Agile<Windows::Media::Capture::MediaCapture> m_mediaCapture;
 		Windows::Media::Capture::Frames::MediaFrameReader^ m_mediaFrameReader;
-
-		std::shared_mutex m_propertiesLock;
+		
 		Windows::Media::Capture::Frames::MediaFrameSource^ m_mediaFrameSource;
 		std::shared_ptr<LocatableCameraFrame> m_frame;
 		uint32 m_frameId;

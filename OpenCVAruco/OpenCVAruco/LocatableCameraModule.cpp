@@ -6,9 +6,9 @@ namespace HololensCamera {
 		Platform::Agile<Windows::Media::Capture::MediaCapture> mediaCapture,
 		Windows::Media::Capture::Frames::MediaFrameReader^ reader,
 		Windows::Media::Capture::Frames::MediaFrameSource^ source)
-		: m_coordinateSystemGuid(LocatableCameraModule::StringToGuid(L"{9D13C82F-2199-4E67-91CD-D1A4181F2534}"))
-		, m_viewTransformGuid(LocatableCameraModule::StringToGuid(L"{4E251FA4-830F-4770-859A-4B8D99AA809B}"))
-		, m_projectionTransformGuid(LocatableCameraModule::StringToGuid(L"{47F9FCB5-2A02-4F26-A477-792FDF95886A}"))
+		: m_coordinateSystemGuid(StringToGuid(L"{9D13C82F-2199-4E67-91CD-D1A4181F2534}"))
+		, m_viewTransformGuid(StringToGuid(L"{4E251FA4-830F-4770-859A-4B8D99AA809B}"))
+		, m_projectionTransformGuid(StringToGuid(L"{47F9FCB5-2A02-4F26-A477-792FDF95886A}"))
 		, m_mediaCapture(std::move(mediaCapture))
 		, m_mediaFrameReader(std::move(reader))
 		, m_mediaFrameSource(std::move(source))
@@ -162,8 +162,8 @@ namespace HololensCamera {
 						//// cameraViewTransform consists of rotation and translation
 						auto cameraViewTransformBox(safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_viewTransformGuid)));
 						auto cameraProjectionTransformBox = safe_cast<Platform::IBoxArray<uint8>^>(frame->Properties->Lookup(m_projectionTransformGuid));
-						auto cameraViewTransform(LocatableCameraModule::IBoxArrayToMatrix(cameraViewTransformBox));
-						auto cameraProjectionTransform = LocatableCameraModule::IBoxArrayToMatrix(cameraProjectionTransformBox);
+						auto cameraViewTransform(IBoxArrayToMatrix(cameraViewTransformBox));
+						auto cameraProjectionTransform = IBoxArrayToMatrix(cameraProjectionTransformBox);
 
 						//DebugInUnity("Start to convert");
 						softwareBitmap = SoftwareBitmap::Convert(softwareBitmap, BitmapPixelFormat::Gray8);
@@ -176,6 +176,8 @@ namespace HololensCamera {
 							m_frame = std::make_shared<LocatableCameraFrame>(
 								++m_frameId, softwareBitmap, cameraSpatialCoordinateSystem,
 								cameraViewTransform, cameraProjectionTransform);
+							//TODO: Pass In Camera coordinate system
+							//PassMatrix4x4()
 						}
 					}
 					catch (Platform::InvalidCastException^ e)
@@ -194,24 +196,5 @@ namespace HololensCamera {
 	}
 
 	
-	Platform::Guid LocatableCameraModule::StringToGuid(Platform::String^ str) {
-		GUID rawguid;
-		HRESULT hr = IIDFromString(str->Data(), &rawguid);
-		if (SUCCEEDED(hr)) {
-			Platform::Guid guid(rawguid);
-			return guid;
-		}
-
-		throw new std::exception("failed to create Guid");
-	}
-
-	DirectX::SimpleMath::Matrix LocatableCameraModule::IBoxArrayToMatrix(Platform::IBoxArray<uint8>^ array)
-	{
-		float* matrixData = reinterpret_cast<float*>(array->Value->Data);
-		return DirectX::SimpleMath::Matrix(
-			matrixData[0], matrixData[1], matrixData[2], matrixData[3],
-			matrixData[4], matrixData[5], matrixData[6], matrixData[7],
-			matrixData[8], matrixData[9], matrixData[10], matrixData[11],
-			matrixData[12], matrixData[13], matrixData[14], matrixData[15]);
-	}
+	
 }

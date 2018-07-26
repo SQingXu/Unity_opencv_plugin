@@ -15,9 +15,9 @@ extern "C" VOID __declspec(dllexport) RegisterPassMatrix4x4Callback(PassMatrix4x
 	}
 }
 
-void PassMatrix4x4(Mat mat) {
+void PassMatrix4x4(Mat mat, int mtype) {
 	if (gPassMatrix4x4Callback && mat.rows == 4 && mat.cols == 4 && mat.type() == CV_64F) {
-		gPassMatrix4x4Callback((double *)mat.data);
+		gPassMatrix4x4Callback((double *)mat.data, mtype);
 	}
 }
 
@@ -64,4 +64,23 @@ bool ConvertMat(SoftwareBitmap^ from, Mat& convertedMat) {
 
 	convertedMat = mat;
 	return true;
+}
+
+Platform::Guid StringToGuid(Platform::String^ str) {
+	GUID rawguid;
+	HRESULT hr = IIDFromString(str->Data(), &rawguid);
+	if (SUCCEEDED(hr)) {
+		Platform::Guid guid(rawguid);
+		return guid;
+	}
+
+	throw new std::exception("failed to create Guid");
+}
+
+Mat IBoxArrayToMatrix(Platform::IBoxArray<uint8>^ array)
+{
+	float* matrixData = reinterpret_cast<float*>(array->Value->Data);
+	float* matrixDataCopy = new float[16];
+	std::copy(matrixData, matrixData + 16, matrixDataCopy);
+	return Mat(4, 4, CV_32F, matrixDataCopy);
 }

@@ -20,14 +20,14 @@ using namespace cv;
 typedef void(__stdcall * DebugCallback) (const char * str);
 extern DebugCallback gDebugCallback;
 
-typedef void(__stdcall * PassMatrix4x4Callback) (double * arr);
+typedef void(__stdcall * PassMatrix4x4Callback) (double * arr, int mtype);
 extern PassMatrix4x4Callback gPassMatrix4x4Callback;
 
 extern "C" VOID __declspec(dllexport) RegisterDebugCallback(DebugCallback callback);
 extern "C" VOID __declspec(dllexport) RegisterPassMatrix4x4Callback(PassMatrix4x4Callback callback);
 
 void DebugInUnity(std::string message);
-void PassMatrix4x4(Mat mat);
+void PassMatrix4x4(Mat mat, int mtype);
 
 template<class T>
 void DebugInUnityMat(Mat mat) {
@@ -52,3 +52,5 @@ void DebugInUnityMat(Matrix mat);
 
 bool GetPointerToPixelData(SoftwareBitmap^ bitmap, unsigned char** pPixelData, unsigned int* capacity);
 bool ConvertMat(SoftwareBitmap^ from, Mat& convertedMat);
+Platform::Guid StringToGuid(Platform::String^ str);
+Mat IBoxArrayToMatrix(Platform::IBoxArray<uint8>^ array);
