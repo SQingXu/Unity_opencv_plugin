@@ -32,6 +32,8 @@ namespace HololensCamera {
 		DirectX::SimpleMath::Matrix m_projectionTransform;*/
 		Mat m_viewTransform;
 		Mat m_projectionTransform;
+		/*Mat m_worldfCameraQuat;
+		Mat m_worldfCameraPos;*/
 
 	};
 

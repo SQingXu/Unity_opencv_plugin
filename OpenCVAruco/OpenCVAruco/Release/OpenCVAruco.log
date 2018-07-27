@@ -6,8 +6,8 @@ c:\users\xsq4525\documents\unity_plugin_aruco\opencvaruco\opencvaruco\opencvaruc
 c:\users\xsq4525\documents\unity_plugin_aruco\opencvaruco\opencvaruco\opencvaruco.cpp(155): warning C4305: 'argument': truncation from 'double' to 'float'
      Creating library ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.lib and object ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.exp
   Generating code
-  296 of 2859 functions (10.4%) were compiled, the rest were copied from previous compilation.
-    21 functions were new in current compilation
-    337 functions had inline decision re-evaluated but remain unchanged
+  25 of 2861 functions ( 0.9%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    9 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   OpenCVAruco.vcxproj -> C:\Users\xsq4525\Documents\unity_plugin_aruco\OpenCVAruco\OpenCVAruco\..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.dll

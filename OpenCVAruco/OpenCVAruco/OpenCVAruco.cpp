@@ -16,7 +16,7 @@ using namespace std;
 using namespace cv;
 using namespace Windows::Storage;
 
-enum MatrixType{MarkerfOrigin = 0, HeadfCamera = 1, HeadfOrigin = 2, RightToLeft = 3, ViewMatrix = 4};
+
 
 std::shared_ptr<LocatableCameraModule> m_locatableCameraModule = nullptr;
 std::shared_ptr<LocatableCameraFrame> m_locatableCameraFrame = nullptr;
@@ -82,10 +82,11 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 				auto locatableCameraFrame = m_locatableCameraModule->GetFrame();
 				std::lock_guard<std::shared_mutex> lock(m_locatableCameraModule->m_propertiesLock);
 				if (locatableCameraFrame != nullptr) {
+					NotifyToStoreTransform((int)MatrixType::StoreForComputation);
 					if (ConvertMat(locatableCameraFrame->GetSoftwareBitmap(), mat)) {
 						if (first_frame) {
 							Mat v_matrix = locatableCameraFrame->GetViewTransform();
-							PassMatrix4x4(v_matrix, (int)MatrixType::ViewMatrix);
+							PassToUnityMatrix(v_matrix, (int)MatrixType::ViewMatrix);
 							DebugInUnityMat<double>(v_matrix);
 
 							Mat p_matrix = locatableCameraFrame->GetProjectionTransform();
@@ -146,7 +147,7 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 						}
 						HeadfOriginMat = HeadfCameraMat * CamerafMarkerMat;
 						//callback to upload this matrix for Unity
-						PassMatrix4x4(HeadfOriginMat, (int)MatrixType::HeadfOrigin);
+						PassToUnityMatrix(HeadfOriginMat, (int)MatrixType::HeadfOrigin);
 
 
 						if (save) {

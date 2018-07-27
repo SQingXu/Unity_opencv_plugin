@@ -141,6 +141,7 @@ namespace HololensCamera {
 		using Windows::Media::Capture::Frames::MediaFrameReference;
 		using Windows::Perception::Spatial::SpatialCoordinateSystem;
 
+		NotifyToStoreTransform((int)MatrixType::CurrentFrameCandidate);
 		if (MediaFrameReference^ frame = sender->TryAcquireLatestFrame())
 		{
 			//DebugInUnity("Try acquire");
@@ -165,12 +166,16 @@ namespace HololensCamera {
 						auto cameraViewTransform(IBoxArrayToMatrix(cameraViewTransformBox));
 						auto cameraProjectionTransform = IBoxArrayToMatrix(cameraProjectionTransformBox);
 
+
+
 						//DebugInUnity("Start to convert");
-						softwareBitmap = SoftwareBitmap::Convert(softwareBitmap, BitmapPixelFormat::Gray8);
+						
 
 						//DebugInUnity("Finish converting");
 						{
 							std::lock_guard<std::shared_mutex> lock(m_propertiesLock);
+							NotifyToStoreTransform((int)MatrixType::CurrentFrameConfirmed);
+							softwareBitmap = SoftwareBitmap::Convert(softwareBitmap, BitmapPixelFormat::Gray8);
 							//DebugInUnity("load frame");
 							//DebugInUnity(std::to_string(m_frameId));
 							m_frame = std::make_shared<LocatableCameraFrame>(

@@ -1,7 +1,8 @@
 #include "Helper.h"
 
 DebugCallback gDebugCallback;
-PassMatrix4x4Callback gPassMatrix4x4Callback;
+PassToUnityMatrixCallback gPassToUnityMatrixCallback;
+NotifyFromNativeCallback gNotifyFromNativeCallback;
 
 extern "C" VOID __declspec(dllexport) RegisterDebugCallback(DebugCallback callback) {
 	if(callback){
@@ -9,15 +10,27 @@ extern "C" VOID __declspec(dllexport) RegisterDebugCallback(DebugCallback callba
 	}
 }
 
-extern "C" VOID __declspec(dllexport) RegisterPassMatrix4x4Callback(PassMatrix4x4Callback callback) {
+extern "C" VOID __declspec(dllexport) RegisterPassToUnityMatrixCallback(PassToUnityMatrixCallback callback) {
 	if (callback) {
-		gPassMatrix4x4Callback = callback;
+		gPassToUnityMatrixCallback = callback;
 	}
 }
 
-void PassMatrix4x4(Mat mat, int mtype) {
-	if (gPassMatrix4x4Callback && mat.rows == 4 && mat.cols == 4 && mat.type() == CV_64F) {
-		gPassMatrix4x4Callback((double *)mat.data, mtype);
+extern "C" VOID __declspec(dllexport) RegisterNotifyFromNativeCallback(NotifyFromNativeCallback callback) {
+	if (callback) {
+		gNotifyFromNativeCallback = callback;
+	}
+}
+
+void PassToUnityMatrix(Mat mat, int mtype) {
+	if (gPassToUnityMatrixCallback && mat.type() == CV_64F) {
+		gPassToUnityMatrixCallback((double *)mat.data, mtype);
+	}
+}
+
+void NotifyToStoreTransform(int mtype) {
+	if (gNotifyFromNativeCallback) {
+		gNotifyFromNativeCallback(mtype);
 	}
 }
 

@@ -17,17 +17,27 @@ using namespace Microsoft::WRL;
 using namespace DirectX::SimpleMath;
 using namespace cv;
 
+enum MatrixType {
+	MarkerfOrigin = 0, HeadfCamera = 1, HeadfOrigin = 2, RightToLeft = 3, ViewMatrix = 4,
+	CurrentFrameCandidate = 5, CurrentFrameConfirmed = 6, StoreForComputation = 7
+};
+
 typedef void(__stdcall * DebugCallback) (const char * str);
 extern DebugCallback gDebugCallback;
 
-typedef void(__stdcall * PassMatrix4x4Callback) (double * arr, int mtype);
-extern PassMatrix4x4Callback gPassMatrix4x4Callback;
+typedef void(__stdcall * PassToUnityMatrixCallback) (double * arr, int mtype);
+extern PassToUnityMatrixCallback gPassToUnityMatrixCallback;
+
+typedef void (__stdcall * NotifyFromNativeCallback) (int mtype);
+extern NotifyFromNativeCallback gNotifyFromNativeCallback;
 
 extern "C" VOID __declspec(dllexport) RegisterDebugCallback(DebugCallback callback);
-extern "C" VOID __declspec(dllexport) RegisterPassMatrix4x4Callback(PassMatrix4x4Callback callback);
+extern "C" VOID __declspec(dllexport) RegisterPassToUnityMatrixCallback(PassToUnityMatrixCallback callback);
+extern "C" VOID __declspec(dllexport) RegisterNotifyFromNativeCallback(NotifyFromNativeCallback callback);
 
 void DebugInUnity(std::string message);
-void PassMatrix4x4(Mat mat, int mtype);
+void PassToUnityMatrix(Mat mat, int mtype);
+void NotifyToStoreTransform(int mtype);
 
 template<class T>
 void DebugInUnityMat(Mat mat) {
