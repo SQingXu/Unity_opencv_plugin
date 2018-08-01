@@ -1,0 +1,144 @@
+fileFormatVersion: 2
+guid: 34083748610eddb488388b7511292cfd
+timeCreated: 1531949277
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: hinges
+    100002: //RootNode
+    100004: pivot
+    100006: scissor1
+    100008: scissor2
+    100010: shaft
+    400000: hinges
+    400002: //RootNode
+    400004: pivot
+    400006: scissor1
+    400008: scissor2
+    400010: shaft
+    2100000: hingesMat
+    2100002: pivotMat
+    2100004: scissor1Mat
+    2100006: scissor2Mat
+    2100008: shaftMat
+    2300000: hinges
+    2300002: pivot
+    2300004: scissor1
+    2300006: scissor2
+    2300008: shaft
+    3300000: hinges
+    3300002: pivot
+    3300004: scissor1
+    3300006: scissor2
+    3300008: shaft
+    4300000: hinges
+    4300002: pivot
+    4300004: scissor1
+    4300006: scissor2
+    4300008: shaft
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: hingesMat
+    second: {fileID: 2100000, guid: beb482ee37e768b4896ffce9971e6c66, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: pivotMat
+    second: {fileID: 2100000, guid: 9f8cb8b658b70c84bb53bf80ed40b4a3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: scissor1Mat
+    second: {fileID: 2100000, guid: 046be99f428c4d44a9ad83b627e36c54, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: scissor2Mat
+    second: {fileID: 2100000, guid: d393ec52298d8564c91dcb7f0fcd80ca, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: shaftMat
+    second: {fileID: 2100000, guid: b0086f0b767818d45aeeeaba9de5e1e9, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

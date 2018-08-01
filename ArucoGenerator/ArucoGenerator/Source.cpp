@@ -11,9 +11,9 @@ int main()
 {
 	Mat marker;
 	Ptr<aruco::Dictionary> dictionary = aruco::getPredefinedDictionary(aruco::DICT_6X6_250);
-	aruco::drawMarker(dictionary, 23, 200, marker, 1);
+	aruco::drawMarker(dictionary, 5, 200, marker, 1);
 	imshow("Marker", marker);
-	imwrite("test23.jpg", marker);
+	imwrite("test5.jpg", marker);
 	waitKey(0);
 
 	return 0;

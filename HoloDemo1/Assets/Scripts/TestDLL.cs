@@ -72,6 +72,7 @@ public class TestDLL : MonoBehaviour {
     PhotoCapture photoCaptureObject;
     private bool stable = false;
     private bool cmd_update_switch = false;
+    private bool thread_update_switch = false;
 
     //void Awake()
     //{
@@ -92,8 +93,8 @@ public class TestDLL : MonoBehaviour {
     //                  : "Native library could not be unloaded.");
     //}
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         PreviousCameraLatestFrameCandidateStore = new TransformStoration();
         PreviousCameraLatestFrameConfirmedStore = new TransformStoration();
         PreviousCameraComputationCandidateStore = new TransformStoration();
@@ -113,8 +114,10 @@ public class TestDLL : MonoBehaviour {
 
         setRightToLeft();
         setHeadfCamera();
+        setMarkerfOrigin();
         PassInMatrix(HeadfCamera, MatrixType.HeadfCamera);
         PassInMatrix(RightToLeft, MatrixType.RightToLeft);
+        PassInMatrix(MarkerfOrigin, MatrixType.MarkerfOrigin);
         Debug.Log("set head finished");
 
         StartCameraModule();
@@ -130,20 +133,20 @@ public class TestDLL : MonoBehaviour {
     void Update()
     {
         //Debug.Log(this.gameObject.transform.position.ToString("F6"));
-        if (!stable)
+        lock (lock_main_camera)
         {
-            lock (lock_main_camera)
-            {
-                MainCameraStore.position = Camera.main.transform.position;
-                MainCameraStore.rotation = Camera.main.transform.rotation;
-            }
-            lock (lock_computation_frame)
+            MainCameraStore.position = Camera.main.transform.position;
+            MainCameraStore.rotation = Camera.main.transform.rotation;
+        }
+        lock (lock_computation_frame)
+        {
+            if (!stable)
             {
                 PreviousCamera.transform.position = PreviousCameraComputationConfirmedStore.position;
                 PreviousCamera.transform.rotation = PreviousCameraComputationConfirmedStore.rotation;
             }
         }
-        
+
         if (cmd_update_switch)
         {
             if (stable)
@@ -155,6 +158,15 @@ public class TestDLL : MonoBehaviour {
                 Destroy(gameObject.GetComponent<WorldAnchor>());
             }
             cmd_update_switch = false;
+        }
+
+        if (thread_update_switch)
+        {
+            if (!stable)
+            {
+                StartCoroutine(CallTrackingMethod());
+            }
+            thread_update_switch = false;
         }
 
     }
@@ -169,11 +181,12 @@ public class TestDLL : MonoBehaviour {
     {
         stable = false;
         cmd_update_switch = true;
+        thread_update_switch = true;
     }
 
     IEnumerator CallTrackingMethod()
     {
-        while (true)
+        while (!stable)
         {
             //Debug.Log("coroutine called");
             DetectMarkersAruco();
@@ -304,7 +317,11 @@ public class TestDLL : MonoBehaviour {
 
     private void setMarkerfOrigin()
     {
-
+        MarkerfOrigin = new Matrix4x4();
+        MarkerfOrigin.SetRow(0, new Vector4(1.0f, 0.0f, 0.0f, 0.175f));
+        MarkerfOrigin.SetRow(1, new Vector4(0.0f, 0.0f, -1.0f, 0.1f));
+        MarkerfOrigin.SetRow(2, new Vector4(0.0f, 1.0f, 0.0f, -0.305f));
+        MarkerfOrigin.SetRow(3, new Vector4(0.0f, 0.0f, 0.0f, 1.0f));
     }
 
     private double[] ConvertMatrixToArray(Matrix4x4 mat)

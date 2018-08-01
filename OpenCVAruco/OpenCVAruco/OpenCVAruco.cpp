@@ -132,10 +132,10 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 					
 					//DebugInUnityMat(v_matrix);
 					aruco::detectMarkers(mat, dictionary, markerCorners, markerIds);
-					if (markerIds.size() > 0) {
+					if (markerIds.size() > 0 ) {
 						
 						//DebugInUnity("Recognize more 0 markers");
-						//DebugInUnity(std::to_string(markerIds.at(0)));
+						
 
 						//Estimate pose MarkerfCamera translation and rotation vector;
 						aruco::estimatePoseSingleMarkers(markerCorners, 0.054, camera_matrix, dist_coeff, rot_vecs, tranl_vecs);
@@ -157,13 +157,14 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 							CamerafMarkerMat = RightToLeftMat * CamerafMarkerMat * RightToLeftMat;
 							//DebugInUnityMat<double>(CamerafMarkerMat);
 						}
-						HeadfOriginMat = HeadfCameraMat * CamerafMarkerMat;
+						HeadfOriginMat = HeadfCameraMat * CamerafMarkerMat * MarkerfOriginMat;
 						//callback to upload this matrix for Unity
 						NotifyToStoreTransform((int)MatrixType::ComputationFrameConfirmed);
 						PassToUnityMatrix(HeadfOriginMat, (int)MatrixType::HeadfOrigin);
 
 
 						if (save) {
+							DebugInUnity(std::to_string(markerIds.at(0)));
 							aruco::drawDetectedMarkers(mat, markerCorners, markerIds);
 							aruco::drawAxis(mat, camera_matrix, dist_coeff, rot_vecs, tranl_vecs, 0.1);
 
