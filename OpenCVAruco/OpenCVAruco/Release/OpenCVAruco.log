@@ -1,13 +1,8 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-  Helper.cpp
-  LocatableCameraModule.cpp
-  OpenCVAruco.cpp
-c:\users\xsq4525\documents\unity_plugin_aruco\opencvaruco\opencvaruco\opencvaruco.cpp(129): warning C4305: 'argument': truncation from 'double' to 'float'
-c:\users\xsq4525\documents\unity_plugin_aruco\opencvaruco\opencvaruco\opencvaruco.cpp(155): warning C4305: 'argument': truncation from 'double' to 'float'
-     Creating library ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.lib and object ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.exp
+     Creating library ..\..\HoloDemo1\Assets\Plugins\OpenCVAruco.lib and object ..\..\HoloDemo1\Assets\Plugins\OpenCVAruco.exp
   Generating code
-  25 of 2861 functions ( 0.9%) were compiled, the rest were copied from previous compilation.
+  35 of 2858 functions ( 1.2%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    9 functions had inline decision re-evaluated but remain unchanged
+    7 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  OpenCVAruco.vcxproj -> C:\Users\xsq4525\Documents\unity_plugin_aruco\OpenCVAruco\OpenCVAruco\..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.dll
+  OpenCVAruco.vcxproj -> C:\Users\xsq4525\Documents\unity_plugin_aruco\OpenCVAruco\OpenCVAruco\..\..\HoloDemo1\Assets\Plugins\OpenCVAruco.dll

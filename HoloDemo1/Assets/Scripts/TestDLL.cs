@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.WSA.WebCam;
+using UnityEngine.XR.WSA.Persistence;
+using UnityEngine.XR.WSA;
 using System.Runtime.InteropServices;
 
 enum MatrixType { MarkerfOrigin = 0, HeadfCamera = 1, HeadfOrigin = 2, RightToLeft = 3, ViewMatrix = 4,
-    CurrentFrameCandidate = 5, CurrentFrameConfirmed = 6, StoreForComputation = 7};
+    CurrentFrameCandidate = 5, CurrentFrameConfirmed = 6, ComputationFrameCandidate = 7, ComputationFrameConfirmed = 8};
 
 public class TransformStoration
 {
@@ -20,6 +22,7 @@ public class TransformStoration
 }
 
 public class TestDLL : MonoBehaviour {
+#if !UNITY_EDITOR
     static IntPtr nativeLibraryPtr;
 
     [DllImport("OpenCVAruco.dll")]
@@ -59,13 +62,16 @@ public class TestDLL : MonoBehaviour {
     GameObject PreviousCamera;
     TransformStoration PreviousCameraLatestFrameConfirmedStore;
     TransformStoration PreviousCameraLatestFrameCandidateStore;
-    TransformStoration PreviousCameraComputationStore;
+    TransformStoration PreviousCameraComputationCandidateStore;
+    TransformStoration PreviousCameraComputationConfirmedStore;
     TransformStoration MainCameraStore;
     private object lock_main_camera;
     private object lock_lastest_frame;
     private object lock_computation_frame;
     
     PhotoCapture photoCaptureObject;
+    private bool stable = false;
+    private bool cmd_update_switch = false;
 
     //void Awake()
     //{
@@ -90,7 +96,8 @@ public class TestDLL : MonoBehaviour {
 	void Start () {
         PreviousCameraLatestFrameCandidateStore = new TransformStoration();
         PreviousCameraLatestFrameConfirmedStore = new TransformStoration();
-        PreviousCameraComputationStore = new TransformStoration();
+        PreviousCameraComputationCandidateStore = new TransformStoration();
+        PreviousCameraComputationConfirmedStore = new TransformStoration();
         MainCameraStore = new TransformStoration();
         PreviousCamera = new GameObject("PreviousCamera");
         CameraChild = new GameObject("CameraChild");
@@ -122,17 +129,46 @@ public class TestDLL : MonoBehaviour {
 
     void Update()
     {
-        lock (lock_main_camera)
+        //Debug.Log(this.gameObject.transform.position.ToString("F6"));
+        if (!stable)
         {
-            MainCameraStore.position = Camera.main.transform.position;
-            MainCameraStore.rotation = Camera.main.transform.rotation;
-        }
-        lock (lock_computation_frame)
-        {
-            PreviousCamera.transform.position = PreviousCameraComputationStore.position;
-            PreviousCamera.transform.rotation = PreviousCameraComputationStore.rotation;
+            lock (lock_main_camera)
+            {
+                MainCameraStore.position = Camera.main.transform.position;
+                MainCameraStore.rotation = Camera.main.transform.rotation;
+            }
+            lock (lock_computation_frame)
+            {
+                PreviousCamera.transform.position = PreviousCameraComputationConfirmedStore.position;
+                PreviousCamera.transform.rotation = PreviousCameraComputationConfirmedStore.rotation;
+            }
         }
         
+        if (cmd_update_switch)
+        {
+            if (stable)
+            {
+                WorldAnchor anchor = this.gameObject.AddComponent<WorldAnchor>();
+            }
+            else
+            {
+                Destroy(gameObject.GetComponent<WorldAnchor>());
+            }
+            cmd_update_switch = false;
+        }
+
+    }
+
+    public void StableObject()
+    {
+        stable = true;
+        cmd_update_switch = true;
+    }
+
+    public void TrackObject()
+    {
+        stable = false;
+        cmd_update_switch = true;
     }
 
     IEnumerator CallTrackingMethod()
@@ -141,8 +177,7 @@ public class TestDLL : MonoBehaviour {
         {
             //Debug.Log("coroutine called");
             DetectMarkersAruco();
-            yield return new WaitForSeconds(1.0f/5);
-
+            yield return new WaitForSeconds(1.0f / 3);
         }
     }
 
@@ -153,16 +188,21 @@ public class TestDLL : MonoBehaviour {
 
     void passToUnityMatrixFunction(IntPtr arr_ptr, int mtype )
     {
-        double[] arr_copy = new double[16];
-        Marshal.Copy(arr_ptr, arr_copy, 0, 16);
+        
         if (mtype == (int)MatrixType.HeadfOrigin)
         {
+            double[] arr_copy = new double[16];
+            Marshal.Copy(arr_ptr, arr_copy, 0, 16);
             HeadfOrigin = ConvertArrayToMatrix(arr_copy);
             //Debug.Log("matrix call back called" + '\n' + HeadfOrigin.ToString());
-            CameraChild.transform.localRotation = ConvertRotMatToQuat(HeadfOrigin);
-            CameraChild.transform.localPosition = new Vector3(HeadfOrigin[0, 3], HeadfOrigin[1, 3], HeadfOrigin[2, 3]);
-            this.gameObject.transform.rotation = CameraChild.transform.rotation;
-            this.gameObject.transform.position = CameraChild.transform.position;
+            if (!stable)
+            {
+                CameraChild.transform.localRotation = ConvertRotMatToQuat(HeadfOrigin);
+                CameraChild.transform.localPosition = new Vector3(HeadfOrigin[0, 3], HeadfOrigin[1, 3], HeadfOrigin[2, 3]);
+                this.gameObject.transform.rotation = CameraChild.transform.rotation;
+                this.gameObject.transform.position = CameraChild.transform.position;
+            }
+            
         }
         else if(mtype == (int)MatrixType.ViewMatrix){
             //WorldfCamera = ConvertArrayToMatrix(arr_copy);
@@ -184,13 +224,9 @@ public class TestDLL : MonoBehaviour {
             
             lock (lock_main_camera)
             {
-                lock (lock_lastest_frame)
-                {
-                    //Debug.Log("Recieve store frame ntification");
-                    PreviousCameraLatestFrameCandidateStore.position = MainCameraStore.position;
-                    PreviousCameraLatestFrameCandidateStore.rotation = MainCameraStore.rotation;
-                }
-                
+                //Debug.Log("Recieve store frame ntification");
+                PreviousCameraLatestFrameCandidateStore.position = MainCameraStore.position;
+                PreviousCameraLatestFrameCandidateStore.rotation = MainCameraStore.rotation;
             }
 
         }
@@ -202,18 +238,22 @@ public class TestDLL : MonoBehaviour {
                 PreviousCameraLatestFrameConfirmedStore.rotation = PreviousCameraLatestFrameCandidateStore.rotation;
             }
         }
-        else if(mtype == (int)MatrixType.StoreForComputation)
+        else if(mtype == (int)MatrixType.ComputationFrameCandidate)
         {
             lock (lock_lastest_frame)
             {
-                lock (lock_computation_frame)
-                {
-                    //Debug.Log("Recieve store computation frame notification");
-                    PreviousCameraComputationStore.position = PreviousCameraLatestFrameConfirmedStore.position;
-                    PreviousCameraComputationStore.rotation = PreviousCameraLatestFrameConfirmedStore.rotation;
-                }
+                PreviousCameraComputationCandidateStore.position = PreviousCameraLatestFrameConfirmedStore.position;
+                PreviousCameraComputationCandidateStore.rotation = PreviousCameraLatestFrameConfirmedStore.rotation;
             }
             
+        }
+        else if(mtype == (int)MatrixType.ComputationFrameConfirmed)
+        {
+            lock (lock_computation_frame)
+            {
+                PreviousCameraComputationConfirmedStore.position = PreviousCameraComputationCandidateStore.position;
+                PreviousCameraComputationConfirmedStore.rotation = PreviousCameraComputationCandidateStore.rotation;
+            }
         }
         return;
     }
@@ -239,9 +279,10 @@ public class TestDLL : MonoBehaviour {
         //HeadfCamera.SetRow(2, new Vector4(0.009330086f, 0.001027526f, 0.9999559f, 0.065153553f));
         //HeadfCamera.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
 
-        HeadfCamera.SetRow(0, new Vector4(0.999904000f, -0.013858700f, -0.000323821f, -0.001245469f));
-        HeadfCamera.SetRow(1, new Vector4(0.013858940f, 0.999904300f, -0.000021737f,  0.020779500f));
-        HeadfCamera.SetRow(2, new Vector4(0.000324095f,  0.000017178f, 0.999999600f, 0.064725410f));
+
+        HeadfCamera.SetRow(0, new Vector4(0.999901500f, -0.013928400f, -0.000545241f, -0.001265314f));
+        HeadfCamera.SetRow(1, new Vector4(0.013928410f, 0.999900000f, 0.000278913f, 0.020772190f));
+        HeadfCamera.SetRow(2, new Vector4(0.000540711f, -0.000287881f, 1.000002000f, 0.064527340f));
         HeadfCamera.SetRow(3, new Vector4(0f, 0f, 0f, 1f));
 
 
@@ -344,5 +385,7 @@ public class TestDLL : MonoBehaviour {
         Debug.Log("head from camera" + '\n' + HeadfCamera.ToString("F9"));
         Debug.Log("head from camera version 2" + '\n' + HeadfCameraV2.ToString("F9"));
     }
+#else
+#endif
 
 }

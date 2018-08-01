@@ -82,26 +82,37 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 				auto locatableCameraFrame = m_locatableCameraModule->GetFrame();
 				std::lock_guard<std::shared_mutex> lock(m_locatableCameraModule->m_propertiesLock);
 				if (locatableCameraFrame != nullptr) {
-					NotifyToStoreTransform((int)MatrixType::StoreForComputation);
+					NotifyToStoreTransform((int)MatrixType::ComputationFrameCandidate);
 					if (ConvertMat(locatableCameraFrame->GetSoftwareBitmap(), mat)) {
 						if (first_frame) {
-							Mat v_matrix = locatableCameraFrame->GetViewTransform();
+							/*Mat v_matrix = locatableCameraFrame->GetViewTransform();
 							PassToUnityMatrix(v_matrix, (int)MatrixType::ViewMatrix);
-							DebugInUnityMat<double>(v_matrix);
+							DebugInUnityMat<double>(v_matrix);*/
 
-							Mat p_matrix = locatableCameraFrame->GetProjectionTransform();
+							/*Mat p_matrix = locatableCameraFrame->GetProjectionTransform();
 							double fx = p_matrix.at<float>(0,0) * (mat.cols / 2);
 							double fy = p_matrix.at<float>(1,1) * (mat.rows / 2);
 							double cx = p_matrix.at<float>(2,0) * (mat.cols / 2) + mat.cols / 2;
-							double cy = p_matrix.at<float>(2,1) * (mat.rows / 2) + mat.rows / 2;
+							double cy = p_matrix.at<float>(2,1) * (mat.rows / 2) + mat.rows / 2;*/
+							double fx = 1547.072;
+							double fy = 1545.725;
+							double cx = 606.7727;
+							double cy = 319.5417;
 							double c_data[] = { fx, 0, cx, 0, fy, cy, 0, 0, 1 };
 							double* c_ptr = new double[9];
 							for (int i = 0; i < 9; i++) {
 								c_ptr[i] = c_data[i];
 							}
 
+							double* d_ptr = new double[5];
+							d_ptr[0] = 0.2131416; //k1
+							d_ptr[1] = -0.2346012; //k2
+							d_ptr[2] = 0; //p1
+							d_ptr[3] = 0; //p2
+							d_ptr[4] = -0.1954667; //k3
+
 							camera_matrix = Mat(3, 3, CV_64F, c_ptr);
-							dist_coeff = Mat::zeros(8, 1, CV_64F);
+							dist_coeff = Mat(5, 1, CV_64F, d_ptr);
 							first_frame = false;
 							DebugInUnityMat<double>(camera_matrix);
 						}
@@ -122,6 +133,7 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 					//DebugInUnityMat(v_matrix);
 					aruco::detectMarkers(mat, dictionary, markerCorners, markerIds);
 					if (markerIds.size() > 0) {
+						
 						//DebugInUnity("Recognize more 0 markers");
 						//DebugInUnity(std::to_string(markerIds.at(0)));
 
@@ -147,6 +159,7 @@ extern "C" __declspec(dllexport) void DetectMarkersAruco() {
 						}
 						HeadfOriginMat = HeadfCameraMat * CamerafMarkerMat;
 						//callback to upload this matrix for Unity
+						NotifyToStoreTransform((int)MatrixType::ComputationFrameConfirmed);
 						PassToUnityMatrix(HeadfOriginMat, (int)MatrixType::HeadfOrigin);
 
 

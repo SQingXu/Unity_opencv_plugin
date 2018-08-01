@@ -19,7 +19,7 @@ using namespace cv;
 
 enum MatrixType {
 	MarkerfOrigin = 0, HeadfCamera = 1, HeadfOrigin = 2, RightToLeft = 3, ViewMatrix = 4,
-	CurrentFrameCandidate = 5, CurrentFrameConfirmed = 6, StoreForComputation = 7
+	CurrentFrameCandidate = 5, CurrentFrameConfirmed = 6, ComputationFrameCandidate = 7, ComputationFrameConfirmed = 8
 };
 
 typedef void(__stdcall * DebugCallback) (const char * str);
