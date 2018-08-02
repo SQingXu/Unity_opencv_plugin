@@ -301,6 +301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60bd7846b61320c47a0c882b1a8214ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncTrans: 1
   holo_port: 8500
   pc_port: 8500
   marker: {fileID: 0}

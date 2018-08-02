@@ -57,7 +57,7 @@ public class CastReceiver : MonoBehaviour
     private GameObject checkLeft;
     private GameObject checkRight;
 
-    public int port = 8500;
+    public int port = 8550;
     void Start()
     {
         this.Instance = this.gameObject.AddComponent<CASTClient>();
@@ -108,10 +108,10 @@ public class CastReceiver : MonoBehaviour
     {
         if(this.Instance.ReceiveDataLeft && this.Instance.ReceiveDataRight)
         {
-            //Debug.Log(Instance.lastFixtureTipTransform_left.position);
-            //Debug.Log(Instance.lastFixtureTipTransform_right.position);
-            //this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
-            //this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
+            Debug.Log(Instance.lastFixtureTipTransform_left.position);
+            Debug.Log(Instance.lastFixtureTipTransform_right.position);
+            this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
+            this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
 
             leftInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_left.position;
             rightInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_right.position;
@@ -160,7 +160,7 @@ public class CastReceiver : MonoBehaviour
 
     class CASTClient : MonoBehaviour
     {
-        private int port = 8500;
+        private int port = 8550;
         private FixtureTipTransform _lastFixtureTipTransform_left;
         private FixtureTipTransform _lastFixtureTipTransform_right;
         private bool _ReceiveDataLeft = false;
@@ -253,11 +253,12 @@ public class CastReceiver : MonoBehaviour
         {
             this.port = _port;
 #if UNITY_WSA_10_0 && !UNITY_EDITOR
-        socket = new DatagramSocket();
-        socket.MessageReceived += SocketOnMessageReceived;
-        socket.BindServiceNameAsync(port.ToString()).GetResults();
-        //outstream = socket.GetOutputStreamAsync(new HostName(ep.Address.ToString()), port.ToString()).GetResults();
-        //writer = new DataWriter(outstream);
+            socket = new DatagramSocket();
+            Debug.Log("port number is " + port);
+            socket.MessageReceived += SocketOnMessageReceived;
+            socket.BindServiceNameAsync(port.ToString()).GetResults();
+            //outstream = socket.GetOutputStreamAsync(new HostName(ep.Address.ToString()), port.ToString()).GetResults();
+            //writer = new DataWriter(outstream);
 #else
             udp = new UdpClient(port);
             udp.BeginReceive(new AsyncCallback(receiveMsg), null);
