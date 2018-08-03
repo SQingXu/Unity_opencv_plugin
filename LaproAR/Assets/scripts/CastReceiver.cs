@@ -7,6 +7,7 @@ using System.Net.Sockets;
 #endif
 
 using System.Net;
+using System.Threading;
 
 using System.Collections;
 //using System.Collections.Generic;
@@ -38,7 +39,8 @@ public class FixtureTipTransform
 }
 public class CastReceiver : MonoBehaviour
 {
-    private CASTClient Instance { get; set; }
+    //private CASTClient Instance { get; set; }
+    private CASTClient Instance;
     private GameObject leftInstruTip;
     private GameObject rightInstruTip;
     private GameObject leftTip_norot;
@@ -57,10 +59,13 @@ public class CastReceiver : MonoBehaviour
     private GameObject checkLeft;
     private GameObject checkRight;
 
+    private static Thread mainThread;
+
     public int port = 8550;
     void Start()
     {
-        this.Instance = this.gameObject.AddComponent<CASTClient>();
+        //mainThread = Thread.CurrentThread;
+        this.Instance = new CASTClient();
         this.Instance.Init(port);
         Debug.Log("CAST UDP receiver start");
 
@@ -108,10 +113,10 @@ public class CastReceiver : MonoBehaviour
     {
         if(this.Instance.ReceiveDataLeft && this.Instance.ReceiveDataRight)
         {
-            Debug.Log(Instance.lastFixtureTipTransform_left.position);
-            Debug.Log(Instance.lastFixtureTipTransform_right.position);
-            this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
-            this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
+            //Debug.Log(Instance.lastFixtureTipTransform_left.position);
+            //Debug.Log(Instance.lastFixtureTipTransform_right.position);
+            //this.transform.parent.Find("LeftInstrumentTip").localPosition = Instance.lastFixtureTipTransform_left.position;
+            //this.transform.parent.Find("RightInstrumentTip").localPosition = Instance.lastFixtureTipTransform_right.position;
 
             leftInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_left.position;
             rightInstruTipTransf.localPosition = Instance.lastFixtureTipTransform_right.position;
@@ -288,7 +293,10 @@ public class CastReceiver : MonoBehaviour
         private async void SocketOnMessageReceived(DatagramSocket sender, DatagramSocketMessageReceivedEventArgs args)
         {
             //Debug.Log("RECEIVED VOID");
-
+            //if(Thread.CurrentThread != mainThread)
+            //{
+            //    Debug.Log("cast receiver handler is not on main thread");
+            //}
             var result = args.GetDataStream();
             var resultStream = result.AsStreamForRead(1400);
 

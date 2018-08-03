@@ -16,7 +16,7 @@ using System.IO;
 
 enum CommandType
 {
-    Stable = 0, Track = 1, SyncTrans = 2
+    Stable = 0, Track = 1, SyncTrans = 2, Follow = 3
 }
 
 enum TransformType
@@ -64,7 +64,7 @@ public class CommandManager : MonoBehaviour {
         client = new HoloPCClient();
 #if !UNITY_EDITOR
         client.Init(pc_port, holo_port);
-        
+        Debug.Log("Command client started");
 #else
         client.Init(holo_port, pc_port);
 #endif
@@ -105,6 +105,12 @@ public class CommandManager : MonoBehaviour {
             Command cmd = new Command((int)CommandType.SyncTrans);
             client.sendMsg(cmd);
         }
+        else if (Input.GetKeyDown(KeyCode.F))
+        {
+            Debug.Log("follow the object");
+            Command cmd = new Command((int)CommandType.Follow);
+            client.sendMsg(cmd);
+        }
 
         if (client.ReceiveCameraTrans)
         {
@@ -126,10 +132,12 @@ public class CommandManager : MonoBehaviour {
 
 class HoloPCClient : MonoBehaviour
 {
+    GameObject origin = GameObject.Find("Origin");
     GameObject marker = GameObject.Find("marker");
     GameObject managers = GameObject.Find("Managers");
     TestDLL MarkerController;
     CommandManager cmdManager;
+    OriginPosition origPos;
 
 
     public string holoip = "152.23.17.145";
@@ -231,7 +239,15 @@ class HoloPCClient : MonoBehaviour
     IPEndPoint ep;
     public void Init(int _port_s, int _port_r)
     {
-        MarkerController = marker.GetComponent<TestDLL>();
+        if(marker != null)
+        {
+            MarkerController = marker.GetComponent<TestDLL>();
+        }
+        if(origin != null)
+        {
+            origPos = origin.GetComponent<OriginPosition>();
+        }
+        
         cmdManager = managers.GetComponent<CommandManager>();
 
         this.send_port = _port_s;
@@ -285,10 +301,11 @@ class HoloPCClient : MonoBehaviour
         {
             var text = await reader.ReadToEndAsync();
             //var text = reader.ReadToEnd();
+            Debug.Log("Command manager MESSAGE: " + text);
 
             handleMsg(text);
 
-            //Debug.Log("MESSAGE: " + text);
+            
         }
     }
 #else
@@ -329,15 +346,37 @@ class HoloPCClient : MonoBehaviour
         if(cmd.command == (int)CommandType.Stable)
         {
             Debug.Log("receive stable command");
-            MarkerController.StableObject();
+            //if(MarkerController != null)
+            //{
+            //    MarkerController.StableObject();
+            //}
+            if(origPos != null)
+            {
+                origPos.stable = true;
+                //origPos.addAnchor();
+            }
         }else if(cmd.command == (int)CommandType.Track)
         {
             Debug.Log("receive track command");
-            MarkerController.TrackObject();
-        }else if(cmd.command == (int)CommandType.SyncTrans)
+            if (MarkerController != null)
+            {
+                MarkerController.TrackObject();
+            }
+            
+        }
+        else if(cmd.command == (int)CommandType.SyncTrans)
         {
             Debug.Log("receive sync command");
             cmdManager.syncTrans = (cmdManager.syncTrans) ? false : true;
+        }
+        else if(cmd.command == (int)CommandType.Follow)
+        {
+            Debug.Log("receive follow command");
+            if (origPos != null)
+            {
+                //origPos.removeAnchor();
+                origPos.stable = false;
+            }
         }
 #else
         TransformNet tn = JsonUtility.FromJson<TransformNet>(msg);

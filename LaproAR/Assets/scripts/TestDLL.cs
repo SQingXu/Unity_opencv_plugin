@@ -73,6 +73,7 @@ public class TestDLL : MonoBehaviour {
     private bool stable = false;
     private bool cmd_update_switch = false;
     private bool thread_update_switch = false;
+    private bool thread_end = true;
 
     //void Awake()
     //{
@@ -120,9 +121,9 @@ public class TestDLL : MonoBehaviour {
         PassInMatrix(MarkerfOrigin, MatrixType.MarkerfOrigin);
         Debug.Log("set head finished");
 
-        StartCameraModule();
+        //StartCameraModule();
         //NativeHelper.Invoke<StartCameraModule>(nativeLibraryPtr);
-        StartCoroutine(CallTrackingMethod());
+        //StartCoroutine(CallTrackingMethod());
 
 
 
@@ -162,7 +163,7 @@ public class TestDLL : MonoBehaviour {
 
         if (thread_update_switch)
         {
-            if (!stable)
+            if (!stable && thread_end)
             {
                 StartCoroutine(CallTrackingMethod());
             }
@@ -186,12 +187,14 @@ public class TestDLL : MonoBehaviour {
 
     IEnumerator CallTrackingMethod()
     {
+        thread_end = false;
         while (!stable)
         {
             //Debug.Log("coroutine called");
             DetectMarkersAruco();
             yield return new WaitForSeconds(1.0f / 3);
         }
+        thread_end = true;
     }
 
     void debugFunction(string str)

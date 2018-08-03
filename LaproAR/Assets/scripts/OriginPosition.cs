@@ -9,6 +9,7 @@ public class OriginPosition : MonoBehaviour {
     //WorldAnchorStore anchorStore;
     //string anchorName = "laparo_anchor";
     public bool stable;
+    public bool anchor_change;
     // Use this for initialization
     void Start () {
         stable = true;
@@ -16,15 +17,27 @@ public class OriginPosition : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (!stable) {
+        if (!stable)
+        {
             Vector3 camera_angle = Camera.main.transform.eulerAngles;
             Vector3 self_angle = this.transform.eulerAngles;
             this.transform.eulerAngles = new Vector3(self_angle.x, camera_angle.y, self_angle.z);
             this.transform.position = Camera.main.transform.position +
                 Quaternion.AngleAxis(camera_angle.y, Vector3.up) * offset;
         }
-        
-	}
+        if (anchor_change)
+        {
+            if (stable)
+            {
+                addAnchor();
+            }
+            else
+            {
+                removeAnchor();
+            }
+        }
+
+    }
     public void addAnchor()
     {
         WorldAnchor anchor = this.gameObject.AddComponent<WorldAnchor>();

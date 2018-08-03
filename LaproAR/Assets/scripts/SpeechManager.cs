@@ -9,6 +9,7 @@ namespace PosterAlignment
 
         KeywordRecognizer keywordRecognizer = null;
         OriginPosition origPos = null;
+        TestDLL MarkerController = null;
         Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
 
         // Use this for initialization
@@ -22,11 +23,13 @@ namespace PosterAlignment
         }
         void Start()
         {
+#if !UNITY_EDITOR
             origPos = GameObject.Find("Origin").GetComponent<OriginPosition>();
             if(origPos == null)
             {
                 Debug.Log("No OriginPosition Instance found");
             }
+            //MarkerController = GameObject.Find("marker").GetComponent<TestDLL>();
             //keywords.Add("Reference Calibration", () =>
             // {
             //     Debug.Log("Voice recognized");
@@ -42,8 +45,12 @@ namespace PosterAlignment
                 {
                     origPos.stable = true;
                     origPos.addAnchor();
-                    
+
                 }
+                //if (MarkerController != null)
+                //{
+                //    MarkerController.StableObject();
+                //}
             });
             keywords.Add("Follow", () =>
             {
@@ -54,11 +61,21 @@ namespace PosterAlignment
                     origPos.stable = false;
                 }
             });
+            keywords.Add("Track", () =>
+            {
+                Debug.Log("track command recognized");
+                if (MarkerController != null)
+                {
+                    MarkerController.TrackObject();
+                }
+            });
            
             keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
             keywordRecognizer.OnPhraseRecognized += Keyword_OnRecognized;
             keywordRecognizer.Start();
             Debug.Log("Speechmanager Started");
+#else
+#endif
         }
 
         void Keyword_OnRecognized(PhraseRecognizedEventArgs arg)
