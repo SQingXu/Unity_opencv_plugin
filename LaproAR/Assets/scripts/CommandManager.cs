@@ -353,6 +353,7 @@ class HoloPCClient : MonoBehaviour
             if(origPos != null)
             {
                 origPos.stable = true;
+                origPos.anchor_change = true;
                 //origPos.addAnchor();
             }
         }else if(cmd.command == (int)CommandType.Track)
@@ -376,6 +377,7 @@ class HoloPCClient : MonoBehaviour
             {
                 //origPos.removeAnchor();
                 origPos.stable = false;
+                origPos.anchor_change = true;
             }
         }
 #else
