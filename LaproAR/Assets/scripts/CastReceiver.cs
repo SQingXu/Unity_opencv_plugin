@@ -169,10 +169,11 @@ public class CastReceiver : MonoBehaviour
     {
         this.Instance.UnregisterMsgHandler();
         this.Instance.socket.Dispose();
-        //Destroy(this.Instance);
+        this.Instance = null;
     }
     public void startSocket()
     {
+        this.Instance = new CASTClient();
         this.Instance.Init(port);
     }
 #else
