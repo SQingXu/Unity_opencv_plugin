@@ -46,6 +46,7 @@ bool save = true;
 extern "C"
 {
 	__declspec(dllexport) void StartCameraModule() {
+		DebugInUnity("Start module");
 		LocatableCameraModule::CreateAsync().then([](std::shared_ptr<LocatableCameraModule> module){
 			DebugInUnity("Finish with create Async function");
 			m_locatableCameraModule = std::move(module);
@@ -72,6 +73,20 @@ extern "C"
 	}
 
 	
+}
+
+extern "C" __declspec(dllexport) void StopCameraModule() {
+	if (m_locatableCameraModule != nullptr) {
+		DebugInUnity("stop module");
+		m_locatableCameraModule->UnregisterArrivedHandler();
+	}
+}
+
+extern "C" __declspec(dllexport) void RestartCameraModule() {
+	if (m_locatableCameraFrame != nullptr) {
+		DebugInUnity("restart module");
+		m_locatableCameraModule->RegisterArrivedHandler();
+	}
 }
 
 extern "C" __declspec(dllexport) void DetectMarkersAruco() {

@@ -1,5 +1,10 @@
 #include "LocatableCameraModule.h"
 #include "Helper.h"
+using Windows::Foundation::TypedEventHandler;
+using Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs;
+using Windows::Media::Capture::Frames::MediaFrameReader;
+using std::placeholders::_1;
+using std::placeholders::_2;
 
 namespace HololensCamera {
 	LocatableCameraModule::LocatableCameraModule(
@@ -14,15 +19,21 @@ namespace HololensCamera {
 		, m_mediaFrameSource(std::move(source))
 		, m_frameId(0)
 	{
-		using Windows::Foundation::TypedEventHandler;
-		using Windows::Media::Capture::Frames::MediaFrameArrivedEventArgs;
-		using Windows::Media::Capture::Frames::MediaFrameReader;
-		using std::placeholders::_1;
-		using std::placeholders::_2;
-
-		m_mediaFrameReader->FrameArrived +=
+		
+		RegisterArrivedHandler();
+		//UnregisterArrivedHandler();
+	}
+	void LocatableCameraModule::RegisterArrivedHandler() {
+		arrived_token = m_mediaFrameReader->FrameArrived +=
 			ref new TypedEventHandler<MediaFrameReader^, MediaFrameArrivedEventArgs^>(
 				std::bind(&LocatableCameraModule::OnFrameArrived, this, _1, _2));
+		handlerIsActive = true;
+	}
+
+	void LocatableCameraModule::UnregisterArrivedHandler() {
+		DebugInUnity("Unregister frame arrived handler");
+		handlerIsActive = false;
+		m_mediaFrameReader->FrameArrived -= arrived_token;
 	}
 
 	Concurrency::task<std::shared_ptr<LocatableCameraModule>> LocatableCameraModule::CreateAsync()
@@ -141,6 +152,9 @@ namespace HololensCamera {
 		using Windows::Media::Capture::Frames::MediaFrameReference;
 		using Windows::Perception::Spatial::SpatialCoordinateSystem;
 
+		if (!handlerIsActive) {
+			return;
+		}
 		NotifyToStoreTransform((int)MatrixType::CurrentFrameCandidate);
 		if (MediaFrameReference^ frame = sender->TryAcquireLatestFrame())
 		{
@@ -153,6 +167,7 @@ namespace HololensCamera {
 					//DebugInUnity("find bitmap");
 					try
 					{
+
 						//DebugInUnity("handling frame arrived event");
 						// Accessing properties can result in throwing an exception since mediaFrameReference can be disposed inside the VideoFrameProcessor.
 						// Handling this part before performance demanding processes tends to prevent throw exceptions.

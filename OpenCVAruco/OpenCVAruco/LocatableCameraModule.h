@@ -13,6 +13,8 @@ namespace HololensCamera {
 			Windows::Media::Capture::Frames::MediaFrameSource^ source);
 		std::shared_ptr<LocatableCameraFrame> GetFrame();
 		std::shared_mutex m_propertiesLock;
+		void RegisterArrivedHandler();
+		void UnregisterArrivedHandler();
 
 	private:
 		void OnFrameArrived(
@@ -29,5 +31,8 @@ namespace HololensCamera {
 		Windows::Media::Capture::Frames::MediaFrameSource^ m_mediaFrameSource;
 		std::shared_ptr<LocatableCameraFrame> m_frame;
 		uint32 m_frameId;
+		Windows::Foundation::EventRegistrationToken arrived_token;
+		bool handlerIsActive;
+
 	};
 }

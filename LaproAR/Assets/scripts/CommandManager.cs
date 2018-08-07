@@ -138,9 +138,10 @@ class HoloPCClient : MonoBehaviour
     TestDLL MarkerController;
     CommandManager cmdManager;
     OriginPosition origPos;
+    CastReceiver castClient;
 
 
-    public string holoip = "152.23.17.145";
+    public string holoip = "152.23.17.122";
     public string pcip = "152.2.142.24";
     public int send_port = 8500;
     public int receive_port = 8500;
@@ -246,10 +247,13 @@ class HoloPCClient : MonoBehaviour
         if(origin != null)
         {
             origPos = origin.GetComponent<OriginPosition>();
+            castClient = origin.GetComponent<CastReceiver>();
+        }
+        if(managers != null)
+        {
+            cmdManager = managers.GetComponent<CommandManager>();
         }
         
-        cmdManager = managers.GetComponent<CommandManager>();
-
         this.send_port = _port_s;
         this.receive_port = _port_r;
 #if UNITY_WSA_10_0 && !UNITY_EDITOR
@@ -346,23 +350,27 @@ class HoloPCClient : MonoBehaviour
         if(cmd.command == (int)CommandType.Stable)
         {
             Debug.Log("receive stable command");
-            //if(MarkerController != null)
-            //{
-            //    MarkerController.StableObject();
-            //}
-            if(origPos != null)
+            if (MarkerController != null)
             {
-                origPos.stable = true;
-                //origPos.addAnchor();
+                MarkerController.StableObject();
             }
-        }else if(cmd.command == (int)CommandType.Track)
+            if (castClient != null)
+            {
+                castClient.startSocket();
+            }
+        }
+        else if(cmd.command == (int)CommandType.Track)
         {
             Debug.Log("receive track command");
+            if (castClient != null)
+            {
+                castClient.closeSocket();
+            }
             if (MarkerController != null)
             {
                 MarkerController.TrackObject();
             }
-            
+
         }
         else if(cmd.command == (int)CommandType.SyncTrans)
         {

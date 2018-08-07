@@ -43,6 +43,12 @@ public class TestDLL : MonoBehaviour {
     [DllImport("OpenCVAruco.dll")]
     public static extern void PassInMatrix(double[] arr, int rows, int cols, int type);
 
+    [DllImport("OpenCVAruco.dll")]
+    public static extern void StopCameraModule();
+
+    [DllImport("OpenCVAruco.dll")]
+    public static extern void RestartCameraModule();
+
 
 
     public delegate void DebugCallback(string str);
@@ -121,9 +127,9 @@ public class TestDLL : MonoBehaviour {
         PassInMatrix(MarkerfOrigin, MatrixType.MarkerfOrigin);
         Debug.Log("set head finished");
 
-        //StartCameraModule();
+        StartCameraModule();
         //NativeHelper.Invoke<StartCameraModule>(nativeLibraryPtr);
-        //StartCoroutine(CallTrackingMethod());
+        StartCoroutine(CallTrackingMethod());
 
 
 
@@ -174,15 +180,24 @@ public class TestDLL : MonoBehaviour {
 
     public void StableObject()
     {
-        stable = true;
-        cmd_update_switch = true;
+        if (!stable)
+        {
+            stable = true;
+            cmd_update_switch = true;
+            StopCameraModule();
+        }
     }
 
     public void TrackObject()
     {
-        stable = false;
-        cmd_update_switch = true;
-        thread_update_switch = true;
+        if (stable)
+        {
+            stable = false;
+            cmd_update_switch = true;
+            RestartCameraModule();
+            thread_update_switch = true;
+        }
+        
     }
 
     IEnumerator CallTrackingMethod()

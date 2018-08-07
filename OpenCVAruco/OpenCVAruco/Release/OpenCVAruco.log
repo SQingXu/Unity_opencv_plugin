@@ -1,8 +1,9 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output Directory does not end with a trailing slash.  This build instance will add the slash as it is required to allow proper evaluation of the Output Directory.
-     Creating library ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.lib and object ..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.exp
+  LocatableCameraModule.cpp
+     Creating library ..\..\LaproAR\HoloApp\LaproAR\Plugins\X86\OpenCVAruco.lib and object ..\..\LaproAR\HoloApp\LaproAR\Plugins\X86\OpenCVAruco.exp
   Generating code
-  13 of 2867 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
-    9 functions were new in current compilation
-    26 functions had inline decision re-evaluated but remain unchanged
+  24 of 2872 functions ( 0.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    10 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  OpenCVAruco.vcxproj -> C:\Users\xsq4525\Documents\unity_plugin_aruco\OpenCVAruco\OpenCVAruco\..\..\HoloDemo1\HoloBuild\HoloDemo1\Plugins\X86\OpenCVAruco.dll
+  OpenCVAruco.vcxproj -> C:\Users\xsq4525\Documents\unity_plugin_aruco\OpenCVAruco\OpenCVAruco\..\..\LaproAR\HoloApp\LaproAR\Plugins\X86\OpenCVAruco.dll

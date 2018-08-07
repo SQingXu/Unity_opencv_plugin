@@ -55,6 +55,7 @@ public class CastReceiver : MonoBehaviour
     private Transform rightInstruPivotTransf;
     private float leftInstruLength;
     private float rightInstruLength;
+    private bool handler_registered = false;
 
     private GameObject checkLeft;
     private GameObject checkRight;
@@ -66,8 +67,8 @@ public class CastReceiver : MonoBehaviour
     {
         //mainThread = Thread.CurrentThread;
         this.Instance = new CASTClient();
-        this.Instance.Init(port);
-        Debug.Log("CAST UDP receiver start");
+        //this.Instance.Init(port);
+        //Debug.Log("CAST UDP receiver start");
 
         //checkLeft = GameObject.Find("RealTipLeft");
         //checkRight = GameObject.Find("RealTipRight");
@@ -163,6 +164,20 @@ public class CastReceiver : MonoBehaviour
 
     }
 
+#if !UNITY_EDITOR
+    public void closeSocket()
+    {
+        this.Instance.UnregisterMsgHandler();
+        this.Instance.socket.Dispose();
+        //Destroy(this.Instance);
+    }
+    public void startSocket()
+    {
+        this.Instance.Init(port);
+    }
+#else
+#endif 
+
     class CASTClient : MonoBehaviour
     {
         private int port = 8550;
@@ -170,6 +185,7 @@ public class CastReceiver : MonoBehaviour
         private FixtureTipTransform _lastFixtureTipTransform_right;
         private bool _ReceiveDataLeft = false;
         private bool _ReceiveDataRight = false;
+        private bool handler_registered = false;
         private object lock_left = new object();
         private object lock_right = new object();
         private object lock_receive_left = new object();
@@ -244,7 +260,7 @@ public class CastReceiver : MonoBehaviour
         }
 
 #if UNITY_WSA_10_0 && !UNITY_EDITOR
-        DatagramSocket socket;
+        public DatagramSocket socket;
         IOutputStream outstream;
         //DataReader reader;
         DataWriter writer;
@@ -254,24 +270,40 @@ public class CastReceiver : MonoBehaviour
 
         IPEndPoint ep;
 
-        public void Init(int _port)
+#if UNITY_WSA_10_0 && !UNITY_EDITOR
+        public async void Init(int _port)
         {
             this.port = _port;
-#if UNITY_WSA_10_0 && !UNITY_EDITOR
+
             socket = new DatagramSocket();
             Debug.Log("port number is " + port);
-            socket.MessageReceived += SocketOnMessageReceived;
-            socket.BindServiceNameAsync(port.ToString()).GetResults();
+            RegisterMsgHandler();
+            await socket.BindServiceNameAsync(port.ToString());
             //outstream = socket.GetOutputStreamAsync(new HostName(ep.Address.ToString()), port.ToString()).GetResults();
             //writer = new DataWriter(outstream);
+        }
 #else
+        public void Init(int _port)
+        {
             udp = new UdpClient(port);
             udp.BeginReceive(new AsyncCallback(receiveMsg), null);
-
-#endif
         }
 
+#endif
+
+
 #if UNITY_WSA_10_0 && !UNITY_EDITOR
+        public void UnregisterMsgHandler()
+        {
+            handler_registered = false;
+            socket.MessageReceived -= SocketOnMessageReceived;
+        }
+
+        public void RegisterMsgHandler()
+        {
+            socket.MessageReceived += SocketOnMessageReceived;
+            handler_registered = true;
+        }
 
         //private async void SendMessage(string message)
         //{
@@ -292,6 +324,10 @@ public class CastReceiver : MonoBehaviour
 
         private async void SocketOnMessageReceived(DatagramSocket sender, DatagramSocketMessageReceivedEventArgs args)
         {
+            if (!handler_registered)
+            {
+                return;
+            }
             //Debug.Log("RECEIVED VOID");
             //if(Thread.CurrentThread != mainThread)
             //{
@@ -335,6 +371,7 @@ public class CastReceiver : MonoBehaviour
 
         void handleMsg(string msg)
         {
+            
             FixtureTipTransform ft = JsonUtility.FromJson<FixtureTipTransform>(msg);
             if (ft.direction.Equals("Left"))
             {
